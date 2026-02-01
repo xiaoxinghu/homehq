@@ -9,6 +9,20 @@ services:
       - ./nginx/html:/usr/share/nginx/html:ro
     depends_on:
       - resilio-sync
+      - jellyfin
+    restart: unless-stopped
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - TZ=Pacific/Auckland
+    volumes:
+      - ./data/jellyfin/config:/config
+      - ./data/jellyfin/cache:/cache
+      - ${JELLYFIN_MEDIA_PATH:-./data/jellyfin/media}:/media:ro
+    ports:
+      - '${JELLYFIN_PORT:-8096}:8096'
     restart: unless-stopped
 
   resilio-sync:

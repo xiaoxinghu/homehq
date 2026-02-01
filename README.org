@@ -109,9 +109,12 @@ homehq/
 │   └── html/
 │       └── index.html    # static dashboard
 ├── data/                 # all persistent data lives here (gitignored)
-│   └── resilio-sync/
-│       ├── config/       # service configuration
-│       └── sync/         # synced files
+│   ├── resilio-sync/
+│   │   ├── config/       # service configuration
+│   │   └── sync/         # synced files
+│   └── jellyfin/
+│       ├── config/       # server configuration and database
+│       └── cache/        # transcoding cache
 ├── scripts/
 │   ├── backup.sh
 │   ├── restore.sh
@@ -194,6 +197,53 @@ folders from =/sync= directory
 
 *Notes:* - Works identically on macOS (testing) and Linux (production) -
 Free tier supports unlimited devices with basic features
+
+--------------
+
+*** Jellyfin
+Media server for streaming movies, TV shows, music, and more.
+
+*Use case:* Stream your personal media library to any device.
+
+*Image:* =jellyfin/jellyfin= (official, multi-arch)
+
+*Docker Compose:*
+
+#+begin_src yaml
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - TZ=Pacific/Auckland
+    volumes:
+      - ./data/jellyfin/config:/config
+      - ./data/jellyfin/cache:/cache
+      - ${JELLYFIN_MEDIA_PATH:-./data/jellyfin/media}:/media:ro
+    ports:
+      - "${JELLYFIN_PORT:-8096}:8096"
+    restart: unless-stopped
+#+end_src
+
+*Ports:* - =8096= -- Web UI and streaming
+
+*Volumes:* - =/config= -- Server configuration and database - =/cache= --
+Transcoding cache - =/media= -- Media library (read-only, configurable)
+
+*Environment Variables:*
+#+begin_src sh
+# .env
+JELLYFIN_PORT=8096              # Optional: override default port
+JELLYFIN_MEDIA_PATH=/mnt/media  # Required for production: path to media library
+#+end_src
+
+*First-time setup:* 1. Access web UI at =http://localhost:8096/= 2. Create
+admin account 3. Add media libraries pointing to =/media= (or
+subdirectories)
+
+*Notes:* - Media path is configurable via =JELLYFIN_MEDIA_PATH= in =.env= -
+For testing, defaults to =./data/jellyfin/media= - For production, point to
+your actual media storage - Media is mounted read-only for safety
 
 --------------
 
