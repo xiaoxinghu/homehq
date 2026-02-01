@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HomeHQ</title>
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family:
+					-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				background: #1a1a2e;
+				color: #eee;
+				min-height: 100vh;
+				padding: 2rem;
+			}
+			h1 {
+				font-size: 2rem;
+				margin-bottom: 2rem;
+				color: #fff;
+			}
+			.services {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: 1rem;
+				max-width: 800px;
+			}
+			.service {
+				background: #16213e;
+				border-radius: 8px;
+				padding: 1.5rem;
+				text-decoration: none;
+				color: #eee;
+				transition:
+					background 0.2s,
+					transform 0.2s;
+			}
+			.service:hover {
+				background: #1f3460;
+				transform: translateY(-2px);
+			}
+			.service h2 {
+				font-size: 1.1rem;
+				margin-bottom: 0.5rem;
+			}
+			.service p {
+				font-size: 0.85rem;
+				color: #aaa;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>HomeHQ</h1>
+		<div class="services">
+			<a href="http://localhost:8888/" class="service">
+				<h2>Resilio Sync</h2>
+				<p>File synchronization</p>
+			</a>
+		</div>
+	</body>
+</html>

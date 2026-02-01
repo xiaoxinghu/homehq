@@ -1,4 +1,4 @@
-# Environment files (contain secrets)
+# Environment files (contain secrets and machine-specific config)
 .env
 
 # Persistent data (gitignored, back up separately)

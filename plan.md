@@ -57,7 +57,7 @@ Reason:
 - `.env` files for environment-specific values
 
 ```
-.env            # not committed
+.env            # not committed (secrets + machine-specific config)
 .env.example    # committed template
 ```
 
@@ -95,11 +95,17 @@ How this works:
 - Each service defined in `docker-compose.yml`
 - Optional grouping via multiple compose files if needed later
 
-Example:
+### Port Conflicts on Dev Machine
+
+If standard ports conflict with other software on your dev machine, override them in `.env`:
+
+```bash
+# .env (not committed)
+RESILIO_WEB_PORT=8889
+RESILIO_SYNC_PORT=55556
 ```
-docker-compose.yml
-docker-compose.override.yml   # optional, host-specific
-```
+
+`docker-compose.yml` uses these with defaults: `${RESILIO_WEB_PORT:-8888}`. On production, omit these variables to use standard ports.
 
 ---
 
@@ -112,6 +118,10 @@ homehq/
 ├── .env                  # not committed, machine-specific
 ├── .gitignore
 ├── plan.md
+├── nginx/                # reverse proxy (version-controlled)
+│   ├── nginx.conf
+│   └── html/
+│       └── index.html    # static dashboard
 ├── data/                 # all persistent data lives here (gitignored)
 │   └── resilio-sync/
 │       ├── config/       # service configuration
@@ -187,13 +197,13 @@ services:
       - ${DATA_ROOT}/resilio-sync/config:/config
       - ${DATA_ROOT}/resilio-sync/sync:/sync
     ports:
-      - "8888:8888"      # Web UI
-      - "55555:55555"    # Sync protocol
+      - "${RESILIO_WEB_PORT:-8888}:8888"
+      - "${RESILIO_SYNC_PORT:-55555}:55555"
     restart: unless-stopped
 ```
 
 **Ports:**
-- `8888` – Web UI for configuration
+- `8888` – Web UI
 - `55555` – BitTorrent sync traffic
 
 **Volumes:**
@@ -201,13 +211,56 @@ services:
 - `/sync` – Synced files
 
 **First-time setup:**
-1. Access web UI at `http://localhost:8888`
+1. Access web UI at `http://localhost:8888/` (or alternate port if using override)
 2. Create a username/password
 3. Add folders from `/sync` directory
 
 **Notes:**
 - Works identically on macOS (testing) and Linux (production)
 - Free tier supports unlimited devices with basic features
+
+---
+
+### Nginx (Reverse Proxy)
+
+Central entry point for all HTTP services.
+
+**Use case:** Serve a dashboard and proxy requests to internal services.
+
+**Image:** `nginx:alpine` (multi-arch, ~8MB)
+
+**Docker Compose:**
+
+```yaml
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+    depends_on:
+      - resilio-sync
+    restart: unless-stopped
+```
+
+**Ports:**
+- `80` – HTTP (dashboard and reverse proxy)
+
+**Volumes (version-controlled):**
+- `nginx/nginx.conf` – Nginx configuration
+- `nginx/html/` – Static files (dashboard)
+
+**Routes:**
+- `/` – Static dashboard (index.html)
+
+**Adding a new service:**
+1. Add service to `docker-compose.yml` with port mapping
+2. Add link to `nginx/html/index.html`
+
+**Note:** Services with their own web UI (like Resilio Sync) are exposed on their own ports rather than proxied through nginx. This avoids issues with apps that expect to be served from root.
 
 ---
 
