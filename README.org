@@ -56,9 +56,6 @@ Portable across OS and hardware
 PUID=1000
 PGID=1000
 
-# Timezone
-TZ=America/Los_Angeles
-
 # Data paths (relative to repo, works on any machine)
 DATA_ROOT=./data
 #+end_src
@@ -105,7 +102,7 @@ homehq/
 ├── .env.example
 ├── .env                  # not committed, machine-specific
 ├── .gitignore
-├── plan.md
+├── README.org
 ├── nginx/                # reverse proxy (version-controlled)
 │   ├── nginx.conf
 │   └── html/
@@ -176,7 +173,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
+      - TZ=Pacific/Auckland
     volumes:
       - ${DATA_ROOT}/resilio-sync/config:/config
       - ${DATA_ROOT}/resilio-sync/sync:/sync

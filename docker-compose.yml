@@ -17,7 +17,7 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
+      - TZ=Pacific/Auckland
     volumes:
       - ${DATA_ROOT}/resilio-sync/config:/config
       - ${DATA_ROOT}/resilio-sync/sync:/sync
