@@ -33,8 +33,8 @@ services:
       - PGID=1000
       - TZ=Pacific/Auckland
     volumes:
-      - ./data/resilio-sync/config:/config
-      - ./data/resilio-sync/sync:/sync
+      - ${SYNC_PATH:-./data/resilio-sync}/config:/config
+      - ${SYNC_PATH:-./data/resilio-sync}/sync:/sync
     ports:
       - '${RESILIO_WEB_PORT:-8888}:8888'
       - '${RESILIO_SYNC_PORT:-55555}:55555'
