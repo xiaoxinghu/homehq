@@ -1,0 +1,5 @@
+# Environment files (contain secrets)
+.env
+
+# Persistent data (gitignored, back up separately)
+data/
